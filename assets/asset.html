@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Viewer</title>
+    <script src="tree.js"></script>
+</head>
+
+<body>
+
+</body>
+
+<script>
+    //tree -fJ > tree.js
+    //let tree = 
+
+    let darkness = function (param) {
+        param.style.mixBlendMode = param.style.mixBlendMode == 'exclusion' ? 'inherit' : 'exclusion'
+    }
+
+    tree[0].contents.forEach(x => {
+        if (x.type == 'file') return
+
+        let folder = document.createElement('p')
+        folder.innerText = x.name
+        document.body.append(folder)
+        folder.style.font = '30px monospace'
+
+        x.contents.forEach(y => {
+            let img = document.createElement('p')
+            img.style.display = 'inline-flex'
+            img.style.flexFlow = 'column'
+            img.style.width = '200px'
+            img.style.height = '200px'
+            img.style.margin = '3px'
+            img.style.padding = '3px'
+            img.style.border = '1px solid'
+            img.style.fontFamily = 'monospace'
+            img.style.justifyContent = 'end'
+            img.style.alignItems = 'center'
+            img.style.backgroundImage = "url('https://toppng.com/uploads/preview/no-transparent-png-11553948956p3qwmcbeyt.png')"
+            img.style.backgroundSize = 'cover'
+
+            img.innerHTML = `<img onclick='darkness(this)' src='${y.name}' alt='${y.name}' style='max-width:185px; max-height:185px;'>
+                            <span>${y.name}</span>`
+            document.body.append(img)
+        }
+        )
+
+        console.log('\n')
+    })
+
+</script>
+
+</html>

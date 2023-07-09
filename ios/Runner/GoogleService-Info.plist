@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1013113776657-ge0hf3nq6j6t4efilnmprb3af5a0gub4.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1013113776657-ge0hf3nq6j6t4efilnmprb3af5a0gub4</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1013113776657-dochki260ogghaie9r0lrfnku4t8sq1m.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAO95gTx5nf2NqH1L-1LgRMVmMIITvce_8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1013113776657</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>io.dracula.moonknight</string>
+	<key>PROJECT_ID</key>
+	<string>moon--knight</string>
+	<key>STORAGE_BUCKET</key>
+	<string>moon--knight.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1013113776657:ios:cc8cf304357e39edae9fb0</string>
+</dict>
+</plist>

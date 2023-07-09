@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1013113776657",
+    "project_id": "moon--knight",
+    "storage_bucket": "moon--knight.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013113776657:android:2da1d14c6bc1e473ae9fb0",
+        "android_client_info": {
+          "package_name": "io.dracula.moonknight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013113776657-dochki260ogghaie9r0lrfnku4t8sq1m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.dracula.moonknight",
+            "certificate_hash": "a2a647969eb0b072d19b24435b182c72c8636caf"
+          }
+        },
+        {
+          "client_id": "1013113776657-v7l5t4btutnlsnvat1pmp2j3g13sunm8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE1obQWmwlblCwR_RWhO5eaxECCVXz7FU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013113776657-3kc26u3l18paqdnu8ue3d9oqce1ukum2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1013113776657-ge0hf3nq6j6t4efilnmprb3af5a0gub4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.dracula.moonknight"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

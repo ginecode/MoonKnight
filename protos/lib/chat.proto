@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package chat;
+
+enum Role {
+  BLOCKED = 0;
+  DENIED = 10;
+  REQUEST = 20;
+  USER = 30;
+  MODERATOR = 40;
+  ADMIN =50;
+}
+
+enum Active {
+  OFFLINE = 0;
+  ONLINE = 10;
+  TYPING = 20;
+}
+
+enum Visible {
+  CLOSE = 0;
+  MODERATED = 10;
+  OPEN = 20;
+}
+
+enum MediaType {
+  TEXT = 0;
+  IMAGE = 5;
+  VIDEO = 10;
+  AUDIO = 15;
+  PDF = 20;
+  FILE = 30;
+  QR = 35;
+}
+
+enum Const {
+  users = 0;
+  rooms = 10;
+  tweets = 20;
+
+  id = 100;
+  nam = 150;
+  email = 200;
+  phone = 250;
+  avatar = 350;
+  status = 400;
+  created = 600;
+  open = 700;
+
+  members = 800;
+  tweet_count = 900;
+  description = 1000;
+}
+
+message User {
+  string id = 100;
+  string nam = 200;
+  string email = 300;
+  string phone = 400;
+  // string token = 5;
+  string avatar = 500;
+  Active status = 600;
+  repeated string rooms = 700;
+  repeated string roomRequest = 800;
+  // repeated string rooms = 8 [json_name = "dinosaur"];
+  // int32 level = 9;
+  string created = 900;
+  // google.protobuf.Timestamp updatedAt = 11;
+  Visible open = 1000;
+}
+
+message RoomUser {
+  string id = 1;
+  Role role = 10;
+  string created = 20;
+}
+
+message Room {
+  string id = 1; 
+  string nam = 10;
+  string avatar = 20;
+  string description = 30;
+  repeated RoomUser members = 40;
+  string created = 50;
+
+  Visible open = 60; // open : true = Anyone can join, false = cant join, null = send request to join
+
+  int32 tweet_count = 70;
+}
+
+message Tweet {
+  string id = 1;
+  string sender_id = 10;
+  string room_id = 20;
+  string created = 30;
+  MediaType media_type = 40;
+  string text = 50;
+  string link = 60;
+}
