@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -103,25 +104,35 @@ Future<UploadTask?> saveFirePickCropImage(
   // );
 }
 
-extension SuperUploasTask on UploadTask {
-  Stream<Future<({bool status, String url})>> streamIt() {
-    return snapshotEvents.map((event) async => event.state == TaskState.success
-        ? (status: true, url: await event.ref.getDownloadURL())
-        : (status: false, url: (event.bytesTransferred / event.totalBytes).toString()));
-  }
+class UploadStatus {
+  final double transferred;
+  final String? url;
+  final bool running;
 
-  void streamPrint() {
-    snapshotEvents.listen((event) async {
-      unicorn(event.state == TaskState.success
-          ? (status: true, url: await event.ref.getDownloadURL())
-          : (status: false, url: (event.bytesTransferred / event.totalBytes).toString()));
-    });
-  }
+  UploadStatus({
+    required this.transferred,
+    this.url,
+    required this.running,
+  });
+}
 
-  Stream<Future<({bool status, String url})>> streamSnap() {
-    return asStream().map((event) async => event.state == TaskState.success
-        ? (status: true, url: await event.ref.getDownloadURL())
-        : (status: false, url: (event.bytesTransferred / event.totalBytes).toString()));
+extension SuperUploadTask on UploadTask {
+  Stream<UploadStatus> get stream {
+    return snapshotEvents.asyncMap(
+      (event) async {
+        return event.state == TaskState.success
+            ? UploadStatus(
+                url: await event.ref.getDownloadURL(),
+                transferred: 1.0,
+                running: event.state == TaskState.running || event.state == TaskState.paused,
+              )
+            : UploadStatus(
+                url: null,
+                transferred: (event.bytesTransferred / event.totalBytes),
+                running: event.state == TaskState.running || event.state == TaskState.paused,
+              );
+      },
+    );
   }
 }
 

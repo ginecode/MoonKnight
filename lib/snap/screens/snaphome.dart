@@ -1,19 +1,13 @@
-import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:moonknight/models/lib/chat.pb.dart';
 import 'package:moonknight/platform_design/profile_tab.dart';
-import 'package:moonknight/snap/proto_help/utils.dart';
-import 'package:tamannaah/darkknight/debug_functions.dart';
-import 'package:tamannaah/ui/mario/mario_test.dart';
 import 'package:tamannaah/darkknight/extensions/extensions.dart';
 
 import '../providers/auth.dart';
 import '../providers/contacts.dart';
-import '../providers/tweets.dart';
 import '../providers/users.dart';
 import '../providers/rooms.dart';
 import '../providers/router.dart';
@@ -141,9 +135,6 @@ class ProfilePage extends ConsumerWidget {
                   ),
                   title: const Text('Log out'),
                 ),
-
-                //
-                MarioTest(),
               ],
             ),
           ),

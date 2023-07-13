@@ -131,7 +131,7 @@ class RoomScreen extends StatelessWidget {
           children: [
             FilledButton.tonalIcon(
               // style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey[300])),
-              onPressed: context.pop,
+              onPressed: context.nav.pop,
               icon: Text('✌🏾', style: TextStyle(fontSize: 20.0)),
               label: Text(
                 'Leave quietly',

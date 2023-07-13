@@ -11,6 +11,25 @@ part 'themes.g.dart';
 @riverpod
 List<ThemeData> allThemes(AllThemesRef ref) {
   return [
+    ThemeData(colorSchemeSeed: const Color(0xff6750a4), useMaterial3: true),
+    ThemeData(
+      colorSchemeSeed: const Color(0xff6750a4),
+      useMaterial3: true,
+      brightness: Brightness.light,
+    ),
+    ThemeData(
+      colorSchemeSeed: const Color(0xff6750a4),
+      useMaterial3: true,
+      brightness: Brightness.dark,
+    ),
+    ThemeData.light().copyWith(
+      primaryColor: const Color(0xff6750a4),
+      useMaterial3: true,
+    ),
+    ThemeData.dark().copyWith(
+      primaryColor: const Color(0xff6750a4),
+      useMaterial3: true,
+    ),
     ThemeData.light().copyWith(
       primaryColor: CupertinoColors.activeOrange,
     ),
@@ -19,11 +38,10 @@ List<ThemeData> allThemes(AllThemesRef ref) {
         seedColor: CupertinoColors.systemPurple,
         brightness: Brightness.dark,
       ),
-      scaffoldBackgroundColor: Color.fromARGB(255, 52, 19, 58),
       primaryColor: CupertinoColors.systemPurple,
     ),
-    ThemeData.dark().copyWith(
-      scaffoldBackgroundColor: Color.fromARGB(255, 52, 19, 58),
+    ThemeData.light().copyWith(
+      colorScheme: ColorScheme.fromSeed(seedColor: CupertinoColors.systemPurple, brightness: Brightness.dark),
       primaryColor: CupertinoColors.systemPurple,
     ),
     ThemeData.light().copyWith(

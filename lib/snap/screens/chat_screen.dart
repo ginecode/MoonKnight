@@ -1,4 +1,8 @@
+// ignore_for_file: depend_on_referenced_packages
+
+import 'dart:async';
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
@@ -16,10 +20,14 @@ import 'package:tamannaah/darkknight/debug_functions.dart';
 import 'package:tamannaah/darkknight/extensions/datetime.dart';
 import 'package:tamannaah/darkknight/extensions/extensions.dart';
 
+import 'package:video_player/video_player.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_chat_types/flutter_chat_types.dart' show PreviewData;
 
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:tamannaah/darkknight/extensions/regex.dart';
+import 'package:tamannaah/ui/mario/mario.dart';
 
 import '../providers/auth.dart';
 import '../providers/rooms.dart';
@@ -82,7 +90,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   title: Text(roomName ?? 'Room / Friend'),
                   subtitle: Text('Members : ${room.members.length}'),
                   onTap: () {
-                    context.bSlidePush(RoomInfo(room.id));
+                    context.nav.bSlidePush(RoomInfo(room.id));
                   },
                 ),
                 centerTitle: true,
@@ -491,24 +499,51 @@ class SendBox extends HookConsumerWidget {
                   final imageTask = await saveFirePickCropImage(
                     '$userId/tweets',
                   );
-                  imageTask?.streamSnap().map((event) async {
-                    final t = await event;
-                    dino('__________');
-                    dino(t);
-                    dino('__________');
-                  });
 
-                  imageTask?.streamPrint();
+                  if (context.mounted && imageTask != null) {
+                    // final url = showDialog<String?>(
+                    //   context: context,
+                    //   builder: (context) {
+                    //     return FireUploadDialog(imageTask: imageTask);
+                    //   },
+                    // );
+                    // dino(url);
+                    LoadingScreenController? contoller = LoadingScreen().show(
+                      context: context,
+                      text: 'Uploading',
+                      action: Row(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              imageTask.cancel();
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              imageTask.pause();
+                            },
+                            child: const Text('Pause'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              imageTask.resume();
+                            },
+                            child: const Text('Resume'),
+                          ),
+                        ],
+                      ),
+                    );
+                    imageTask.stream.listen(
+                      (event) {
+                        contoller?.update(event.transferred.toString());
+                        if (!event.running) {
+                          LoadingScreen().hide();
+                        }
+                      },
+                    );
+                  }
 
-                  imageTask?.streamIt().map((event) async {
-                    final t = await event;
-                    lava('__________');
-                    lava(t);
-                    lava('__________');
-                  });
-                  imageTask?.onError(
-                    (error, stackTrace) => lava(error),
-                  );
                   final imageUrl = await imageTask?.then(
                     (p0) => p0.ref.getDownloadURL(),
                   );
@@ -578,7 +613,7 @@ class SendBox extends HookConsumerWidget {
                     // );
 
                     if (mediaType != MediaType.TEXT) {
-                      context.pop();
+                      context.nav.pop();
                     }
                   }
                 },
@@ -619,6 +654,10 @@ class FireChat extends HookConsumerWidget {
     }, [room]);
 
     dino(room);
+
+    return VideoPlayerBox(
+      videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+    );
 
     Query<Tweet?>? query = room?.tweetCol?.orderBy(
       Const.created.name,
@@ -692,7 +731,7 @@ class FireChat extends HookConsumerWidget {
             title: Text(roomName ?? 'Room / Friend'),
             subtitle: Text('Members : ${room.members.length}'),
             onTap: () {
-              context.bSlidePush(RoomInfo(room.id));
+              context.nav.bSlidePush(RoomInfo(room.id));
             },
           ),
           centerTitle: true,
@@ -894,6 +933,391 @@ class TweetBox extends HookConsumerWidget {
           ]..sort(
               (_, __) => me.id == tweet.senderId ? -1 : 1,
             ),
+        ),
+      ),
+    );
+  }
+}
+
+class VideoPlayerBox extends StatefulWidget {
+  const VideoPlayerBox({super.key, required this.videoUrl});
+
+  final String videoUrl;
+
+  @override
+  State<VideoPlayerBox> createState() => _VideoPlayerBoxState();
+}
+
+class _VideoPlayerBoxState extends State<VideoPlayerBox> with SingleTickerProviderStateMixin {
+  late VideoPlayerController _videoPlayerController;
+  bool _isPlaying = false;
+  double _sliderValue = 0.0;
+  late AnimationController _animationController;
+  bool _showControls = true;
+  bool _showReplayButton = false;
+  bool _isFullScreen = false;
+
+  Timer? _hideControlsTimer;
+  static const Duration _controlsVisibleDuration = Duration(seconds: 3);
+  static const Duration _controlsHideDuration = Duration(milliseconds: 300);
+
+  static const List<Duration> _exampleCaptionOffsets = <Duration>[
+    Duration(seconds: -10),
+    Duration(seconds: -3),
+    Duration(seconds: -1, milliseconds: -500),
+    Duration(milliseconds: -250),
+    Duration.zero,
+    Duration(milliseconds: 250),
+    Duration(seconds: 1, milliseconds: 500),
+    Duration(seconds: 3),
+    Duration(seconds: 10),
+  ];
+  static const List<double> _examplePlaybackRates = <double>[
+    0.25,
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    3.0,
+    5.0,
+    10.0,
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _videoPlayerController = VideoPlayerController.networkUrl(
+      Uri.parse(widget.videoUrl),
+    )
+      ..addListener(() {
+        final bool isPlaying = _videoPlayerController.value.isPlaying;
+
+        // Inside the `addListener` callback of the `VideoPlayerController`
+        if (_videoPlayerController.value.isInitialized && !_videoPlayerController.value.isBuffering) {
+          setState(() {
+            _sliderValue = _videoPlayerController.value.position.inSeconds.toDouble() /
+                _videoPlayerController.value.duration.inSeconds.toDouble();
+          });
+        }
+
+        if (_videoPlayerController.value.position >= _videoPlayerController.value.duration) {
+          setState(() {
+            _showReplayButton = true;
+          });
+        }
+
+        if (isPlaying != _isPlaying) {
+          setState(() {
+            _isPlaying = isPlaying;
+          });
+          _startHideControlsTimer();
+        }
+      })
+      ..initialize().then((_) {
+        setState(() {});
+        _videoPlayerController.play();
+      });
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 250),
+    );
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    _animationController.dispose();
+    _hideControlsTimer?.cancel();
+    super.dispose();
+  }
+
+  void _playPauseVideo() {
+    setState(() {
+      if (_videoPlayerController.value.isPlaying) {
+        _videoPlayerController.pause();
+        _animationController.forward();
+      } else {
+        _videoPlayerController.play();
+        _animationController.reverse();
+      }
+      _startHideControlsTimer();
+    });
+  }
+
+  void _onSliderChanged(double value) {
+    setState(() {
+      _sliderValue = value;
+      final Duration duration = _videoPlayerController.value.duration;
+      final double newPosition = value * duration.inMilliseconds.toDouble();
+      _videoPlayerController.seekTo(Duration(milliseconds: newPosition.toInt()));
+    });
+  }
+
+  void _startHideControlsTimer() {
+    _hideControlsTimer?.cancel();
+    _hideControlsTimer = Timer(_controlsVisibleDuration, () {
+      setState(() {
+        _showControls = false;
+      });
+    });
+    setState(() {
+      _showControls = true;
+    });
+  }
+
+  void _replayVideo() {
+    setState(() {
+      _videoPlayerController.seekTo(Duration.zero);
+      _videoPlayerController.play();
+      _animationController.reverse();
+      _showReplayButton = false;
+    });
+  }
+
+  void _cancelHideControlsTimer() {
+    _hideControlsTimer?.cancel();
+    setState(() {
+      _showControls = true;
+    });
+  }
+
+  void _tapSeek(bool forward) {
+    // final Duration duration = _videoPlayerController.value.duration;
+    final double currentPosition = _videoPlayerController.value.position.inMilliseconds.toDouble();
+    final double targetPosition = currentPosition + (forward ? 10000 : -10000)
+        //* (math.min(duration.inMilliseconds * 0.1, 10000))
+        ;
+    _videoPlayerController.seekTo(Duration(milliseconds: targetPosition.toInt()));
+  }
+
+  void _showHideButton() {
+    if (_showControls) {
+      _cancelHideControlsTimer();
+    } else {
+      _startHideControlsTimer();
+    }
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+      if (_isFullScreen) {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+      } else {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+        ]);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: (!_isFullScreen) ? AppBar() : null,
+      body: Center(
+        child: GestureDetector(
+          onTap: () {
+            // _videoPlayerController.value.isPlaying ? _videoPlayerController.pause() : _videoPlayerController.play();
+            _showHideButton();
+          },
+          onDoubleTapDown: (details) {
+            final double screenWidth = MediaQuery.of(context).size.width;
+            if (details.globalPosition.dx < screenWidth / 2) {
+              _tapSeek(false);
+            } else {
+              _tapSeek(true);
+            }
+            _showHideButton();
+          },
+          child: AspectRatio(
+            aspectRatio: _videoPlayerController.value.aspectRatio,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  _videoPlayerController.value.isInitialized
+                      ? AspectRatio(
+                          aspectRatio: _videoPlayerController.value.aspectRatio,
+                          child: VideoPlayer(_videoPlayerController),
+                        )
+                      : CircularProgressIndicator(),
+
+                  //
+                  if (!_videoPlayerController.value.isPlaying) ...[
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 50),
+                      reverseDuration: const Duration(milliseconds: 200),
+                      child: _videoPlayerController.value.isPlaying
+                          ? const SizedBox.shrink()
+                          : Container(
+                              color: Colors.black26,
+                              // child: const Center(
+                              //   child: Icon(
+                              //     Icons.play_arrow,
+                              //     color: Colors.white,
+                              //     size: 100.0,
+                              //     semanticLabel: 'Play',
+                              //   ),
+                              // ),
+                            ),
+                    ),
+                    // Positioned(
+                    //   top: 0,
+                    //   left: 0,
+                    //   right: 0,
+                    //   child: Container(
+                    //     padding: EdgeInsets.all(16.0),
+                    //     child: Flexible(
+                    //       child: Text(
+                    //         'widget.title gdfvdfs lkscjlksjc slcjslckj ',
+                    //         overflow: TextOverflow.ellipsis,
+                    //         style: TextStyle(
+                    //           fontSize: 20.0,
+                    //           fontWeight: FontWeight.bold,
+                    //           color: Colors.white,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    if (!_showReplayButton)
+                      GestureDetector(
+                        onTap: _playPauseVideo,
+                        child: Icon(
+                          Icons.play_arrow,
+                          size: 80,
+                          color: Colors.white,
+                        ),
+                      ),
+                  ],
+
+                  //
+                  if (_showControls && !_showReplayButton) ...[
+                    AnimatedOpacity(
+                      opacity: _showControls ? 1.0 : 0.0,
+                      duration: _controlsHideDuration,
+                      child: GestureDetector(
+                        onTap: _playPauseVideo,
+                        child: AnimatedIcon(
+                          icon: AnimatedIcons.pause_play,
+                          progress: _animationController,
+                          size: 80,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 10,
+                      left: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Row(
+                          children: [
+                            Text(
+                              '${durationMMSS(_videoPlayerController.value.position)} / ${durationMMSS(_videoPlayerController.value.duration)}',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            Expanded(
+                              child: Slider(
+                                value: _sliderValue,
+                                onChanged: _onSliderChanged,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: _toggleFullScreen,
+                              icon: Icon(
+                                Icons.fullscreen,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 5,
+                      right: 5,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PopupMenuButton<Duration>(
+                            initialValue: _videoPlayerController.value.captionOffset,
+                            tooltip: 'Caption Offset',
+                            onSelected: (Duration delay) {
+                              _videoPlayerController.setCaptionOffset(delay);
+                            },
+                            itemBuilder: (BuildContext context) {
+                              return <PopupMenuItem<Duration>>[
+                                for (final Duration offsetDuration in _exampleCaptionOffsets)
+                                  PopupMenuItem<Duration>(
+                                    value: offsetDuration,
+                                    child: Text('${offsetDuration.inMilliseconds}ms'),
+                                  )
+                              ];
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                // Using less vertical padding as the text is also longer
+                                // horizontally, so it feels like it would need more spacing
+                                // horizontally (matching the aspect ratio of the video).
+                                vertical: 12,
+                                horizontal: 16,
+                              ),
+                              child: Text('${_videoPlayerController.value.captionOffset.inMilliseconds}ms'),
+                            ),
+                          ),
+                          PopupMenuButton<double>(
+                            initialValue: _videoPlayerController.value.playbackSpeed,
+                            tooltip: 'Playback speed',
+                            onSelected: (double speed) {
+                              _videoPlayerController.setPlaybackSpeed(speed);
+                            },
+                            itemBuilder: (BuildContext context) {
+                              return <PopupMenuItem<double>>[
+                                for (final double speed in _examplePlaybackRates)
+                                  PopupMenuItem<double>(
+                                    value: speed,
+                                    child: Text('${speed}x'),
+                                  )
+                              ];
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                // Using less vertical padding as the text is also longer
+                                // horizontally, so it feels like it would need more spacing
+                                // horizontally (matching the aspect ratio of the video).
+                                vertical: 12,
+                                horizontal: 16,
+                              ),
+                              child: Text('${_videoPlayerController.value.playbackSpeed}x'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (_showReplayButton)
+                    GestureDetector(
+                      onTap: _replayVideo,
+                      child: Icon(
+                        Icons.replay,
+                        size: 80,
+                        color: Colors.white,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

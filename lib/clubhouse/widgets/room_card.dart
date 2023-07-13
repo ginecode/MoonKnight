@@ -17,7 +17,7 @@ class RoomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.rSlidePush(RoomScreen(room: room)),
+      onTap: () => context.nav.rSlidePush(RoomScreen(room: room)),
       child: Padding(
         padding: 4.ev,
         child: Card(

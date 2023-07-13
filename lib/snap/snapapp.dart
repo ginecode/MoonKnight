@@ -79,7 +79,7 @@ void snap() {
       ProviderScope(
         parent: container,
         // observers: [StateLogger()],
-        child: SnapApp(),
+        child: const SnapApp(),
       ),
     );
 
@@ -109,7 +109,7 @@ class SnapApp extends ConsumerWidget {
       ),
 
 //
-      localizationsDelegates: [
+      localizationsDelegates: const [
         CountryLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

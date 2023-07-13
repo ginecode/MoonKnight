@@ -104,7 +104,7 @@ class ProfileRoute extends GoRouteData {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 GoRouter goRouter(GoRouterRef ref) {
   // final authListenable = ref.watch(authProvider.notifier);
   final user = ref.watch(currentUserProvider).value;
