@@ -115,6 +115,9 @@ dependencies:
 
   flutter_native_splash: ^2.3.1
 
+  carousel_slider: ^4.2.1
+  curved_navigation_bar: ^1.0.3
+
   tamannaah:
     path: ../Witches/packages/Tamannaah
 
@@ -193,6 +196,11 @@ flutter:
     - assets/
     - assets/icons/
     - assets/images/members/
+
+    - assets/category/
+    - assets/discount/
+    - assets/food/
+    - assets/main/
 
 flutter_launcher_icons:
   #  image_path: "assets/images/icon-128x128.png"

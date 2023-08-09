@@ -177,11 +177,11 @@ extension $ProfileRouteExtension on ProfileRoute {
 // RiverpodGenerator
 // **************************************************************************
 
-String _$goRouterHash() => r'bef32299e0215e4c1cf94b40f9176cf01feac571';
+String _$goRouterHash() => r'd5139697836484674a0008d39d2391377ce55ba2';
 
 /// See also [goRouter].
 @ProviderFor(goRouter)
-final goRouterProvider = AutoDisposeProvider<GoRouter>.internal(
+final goRouterProvider = Provider<GoRouter>.internal(
   goRouter,
   name: r'goRouterProvider',
   debugGetCreateSourceHash:
@@ -190,5 +190,5 @@ final goRouterProvider = AutoDisposeProvider<GoRouter>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef GoRouterRef = AutoDisposeProviderRef<GoRouter>;
+typedef GoRouterRef = ProviderRef<GoRouter>;
 // ignore_for_file: unnecessary_raw_strings, subtype_of_sealed_class, invalid_use_of_internal_member, do_not_use_environment, prefer_const_constructors, public_member_api_docs, avoid_private_typedef_functions

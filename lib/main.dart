@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:moonknight/photoview/home_screen.dart';
 import 'package:moonknight/simple_browser/main.dart';
 import 'package:moonknight/snap/screens/camera.dart';
+import 'package:tamannaah/forms/sherlock.dart';
+import 'package:tamannaah/ui/mario/mario_test.dart';
 import 'charts/main.dart';
 import 'package:moonknight/snap/snapapp.dart';
 import 'basic_app_2/basic_app2.dart';
@@ -13,6 +15,7 @@ import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'food_ui/main.dart';
 import 'insta/main.dart';
 import 'graphic/main.dart';
 import 'material3/main.dart';
@@ -23,6 +26,10 @@ void main() async {
 
   // clubhouse();
 
+  // runApp(MarioTest());
+
+  // runApp(const FoodOrder());
+
   // runApp(MaterialApp(home: DismissibleSimple()));
   // runApp(const MaterialApp(home: PhotoviewScreen()));
 
@@ -30,19 +37,16 @@ void main() async {
 
   // runApp(const ProviderScope(child: BrowserApp()));
 
-  /**
-   * AutoDisposeAsyncNotifierProvider
-   */
   // runApp(const ProviderScope(observers: [StateLogger()], child: GoRouterRiver()));
 
   // cameraMain();
 
   // runApp(const MaterialDemo());
 
-  // graphicmain();
+  graphicmain();
   // chartsMain();
 
-  snap();
+  // snap();
 
   // insta();
 }

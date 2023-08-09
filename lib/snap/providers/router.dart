@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moonknight/snap/screens/snap_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:tamannaah/router/special/error404.dart';
 
 import '../../photoview/home_screen.dart';
 import '../screens/snaphome.dart';
@@ -116,6 +117,9 @@ GoRouter goRouter(GoRouterRef ref) {
     debugLogDiagnostics: true,
     // initialLocation: HomeScreenRoute().location,
     routes: $appRoutes,
+    errorBuilder: (context, state) {
+      return AgniError(state.error);
+    },
     redirect: (BuildContext context, GoRouterState state) {
       log('Redirect : $user');
       // print(
